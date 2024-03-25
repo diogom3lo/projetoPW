@@ -25,7 +25,7 @@ function StockRouter() {
             console.log('post');
             let body = req.body;
           
-            Players.create(body)
+            Stock.create(body)
             .then(() => {
                 console.log('Created!');
                 res.status(200);

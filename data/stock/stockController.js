@@ -24,7 +24,7 @@ function StockController(StockModel) {
     function findAll(){
         return new Promise(function(resolve, reject){
             StockModel.find({})
-                .then((Stock) => {
+                .then((stock) => {
                     resolve(stock);
                 })
                 .catch((err) => {
