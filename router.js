@@ -1,5 +1,5 @@
 const express = require('express');
-let ProjetoAPI = require('.data/server/stock');
+let ProjetoAPI = require('./server/stock');
 
 function initialize(){
     let api = express();
