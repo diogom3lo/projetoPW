@@ -1,7 +1,8 @@
 function StockController(StockModel) {
     let controller = {
         create,
-        findAll
+        findAll,
+        update 
     }
 
     function create (values){
@@ -32,6 +33,25 @@ function StockController(StockModel) {
             });
         });
     }
+
+    function update(id, values){
+        return new Promise(function(resolve, reject) {
+            // UpdateOne function will update the document that matches the filter
+            StockModel.updateOne({_id: id}, values)
+                .then(result => {
+                    if (result.nModified > 0) {
+                        resolve('Stock updated');
+                    } else {
+                        // If nModified is 0, it means the document wasn't found or no changes were made
+                        reject(new Error('Stock not found or no changes made'));
+                    }
+                })
+                .catch(err => {
+                    reject(err); // Handle any errors that occur during the update operation
+                });
+        });
+    }
+
     
     return controller;
     }
