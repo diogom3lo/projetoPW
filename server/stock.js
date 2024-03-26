@@ -1,6 +1,7 @@
 const bodyParser = require('body-parser');
 const express = require('express');
 const Stock = require('../data/stock');
+const StockController = require('../data/stock/stockController');
 
 function StockRouter() {
     let router = express();
@@ -40,22 +41,22 @@ function StockRouter() {
                 next();
             });
         })
-        router.put('/:id', function(req, res, next) {
+        .put('stock/:id', function(req, res, next) {
             let body = req.body;
             let id = req.params.id;
-            
-            StockController.update(id, body)
+            Stock.update(id, body)
                 .then(() => {
                     console.log('Stock updated!');
-                    res.status(200).json({ message: 'Stock updated successfully' });
+                    res.status(200);
+                    res.send(body);
+                    next();
                 })
                 .catch((err) => {
-                    console.error('Error updating stock:', err);
-                    if (err instanceof Error && err.message === 'Stock not found or no changes made') {
-                        res.status(404).json({ error: 'Stock not found or no changes made' });
-                    } else {
-                        res.status(500).json({ error: 'Internal server error' });
-                    }
+                    console.log(err);
+                    console.log('Stock not found or no changes made');
+                    err.status = err.status || 500;
+                    res.status(400);
+                    next();
                 });
         });
     

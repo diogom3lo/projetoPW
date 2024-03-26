@@ -2,7 +2,7 @@ function StockController(StockModel) {
     let controller = {
         create,
         findAll,
-        update 
+        update
     }
 
     function create (values){
