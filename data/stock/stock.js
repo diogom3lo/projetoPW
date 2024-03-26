@@ -7,5 +7,5 @@ var StockSchema = new Schema({
     number: {type: Number, required: true}
 });
 
-let Player = mongoose.model('Stock', StockSchema);
-module.exports = Player;
+let Stock = mongoose.model('Stock', StockSchema);
+module.exports = Stock;
