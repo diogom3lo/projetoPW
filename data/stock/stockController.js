@@ -36,18 +36,30 @@ function StockController(StockModel) {
 
     function update(id, values){
         return new Promise(function(resolve, reject) {
-            // UpdateOne function will update the document that matches the filter
-            StockModel.updateOne({_id: id}, values)
-                .then(result => {
-                    if (result.nModified > 0) {
-                        resolve('Stock updated');
+            // First, check if the document exists
+            StockModel.findById(id)
+                .then(doc => {
+                    if (!doc) {
+                        // No document found with that ID
+                        reject(new Error('Stock not found'));
                     } else {
-                        // If nModified is 0, it means the document wasn't found or no changes were made
-                        reject(new Error('Stock not found or no changes made'));
+                        // Document exists, attempt to update
+                        StockModel.updateOne({_id: id}, values)
+                            .then(result => {
+                                if (result.nModified > 0) {
+                                    resolve('Stock updated');
+                                } else {
+                                    // Document was found but no changes were made
+                                    reject(new Error('No changes made to the stock'));
+                                }
+                            })
+                            .catch(err => {
+                                reject(err); // Handle any errors that occur during the update operation
+                            });
                     }
                 })
                 .catch(err => {
-                    reject(err); // Handle any errors that occur during the update operation
+                    reject(err); // Handle any errors that occur during the findById operation
                 });
         });
     }

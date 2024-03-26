@@ -9,7 +9,7 @@ function StockRouter() {
     router.use(bodyParser.json({limit: '100mb'}));
     router.use(bodyParser.urlencoded({limit: '100mb', extended: true}));
 
-    
+    // Handle GET and POST requests for '/stock'
     router.route('/stock')
         .get(function(req, res, next){
             console.log('get all stock');
@@ -19,7 +19,7 @@ function StockRouter() {
                 next();
             })
             .catch((err) => {
-                next();
+                next(err); // Pass the error to error-handling middleware
             });
         })
         .post(function(req, res, next){
@@ -29,44 +29,38 @@ function StockRouter() {
             Stock.create(body)
             .then(() => {
                 console.log('Created!');
-                res.status(200);
-                res.send(body);
+                res.status(200).send(body);
                 next();
             })
             .catch((err) => {
                 console.log(err);
                 console.log('stock already exists!');
                 err.status = err.status || 500;
-                res.status(400);
-                next();
+                res.status(400).send('Error creating stock');
+                next(err); // Pass the error to error-handling middleware
             });
-        })
-        .put('stock/:id', function(req, res, next) {
-            let body = req.body;
-            let id = req.params.id;
-            Stock.update(id, body)
-                .then(() => {
-                    console.log('Stock updated!');
-                    res.status(200);
-                    res.send(body);
-                    next();
-                })
-                .catch((err) => {
-                    console.log(err);
-                    console.log('Stock not found or no changes made');
-                    err.status = err.status || 500;
-                    res.status(400);
-                    next();
-                });
         });
-    
 
+    // Define PUT request separately for '/stock/:id'
+    router.put('/stock/:id', function(req, res, next) {
+        let body = req.body;
+        let id = req.params.id;
+        Stock.update(id, body)
+            .then(() => {
+                console.log('Stock updated!');
+                res.status(200).send(body);
+                next();
+            })
+            .catch((err) => {
+                console.log(err);
+                console.log('Stock not found or no changes made');
+                err.status = err.status || 500;
+                res.status(400).send('Error updating stock');
+                next(err); // Pass the error to error-handling middleware
+            });
+    });
 
-    
-    
     return router;
 }
-
-
 
 module.exports = StockRouter;
