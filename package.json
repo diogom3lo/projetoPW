@@ -5,6 +5,7 @@
     "http": "^0.0.1-security",
     "mongodb": "^6.5.0",
     "mongoose": "^8.2.3",
+    "mongose": "^0.0.2-security",
     "node": "^21.7.1",
     "node.js": "^0.0.1-security",
     "nodemon": "^3.1.0"
