@@ -36,30 +36,18 @@ function StockController(StockModel) {
 
     function update(id, values){
         return new Promise(function(resolve, reject) {
-            // First, check if the document exists
-            StockModel.findById(id)
-                .then(doc => {
-                    if (!doc) {
-                        // No document found with that ID
-                        reject(new Error('Stock not found'));
+            StockModel.updateOne({_id: id}, values)
+                .then(result => {
+                    if (result.modifiedCount > 0) {
+                        resolve('Stock updated');
                     } else {
-                        // Document exists, attempt to update
-                        StockModel.updateOne({_id: id}, values)
-                            .then(result => {
-                                if (result.nModified > 0) {
-                                    resolve('Stock updated');
-                                } else {
-                                    // Document was found but no changes were made
-                                    reject(new Error('No changes made to the stock'));
-                                }
-                            })
-                            .catch(err => {
-                                reject(err); // Handle any errors that occur during the update operation
-                            });
+                        // This condition will now correctly reflect no actual modification was done,
+                        // though it should not be reached if `modifiedCount` is 1 as per your result.
+                        reject(new Error('No changes made to the stock'));
                     }
                 })
                 .catch(err => {
-                    reject(err); // Handle any errors that occur during the findById operation
+                    reject(err); // Handle any errors that occur during the update operation
                 });
         });
     }
