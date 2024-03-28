@@ -21,7 +21,7 @@ function StockController(StockModel) {
         let newStock = StockModel(values);
         return save(newStock);
     }
-    
+
     /**
      * Saves the stock item to the database.
      * @param {Object} newStock - The stock item to be saved.
