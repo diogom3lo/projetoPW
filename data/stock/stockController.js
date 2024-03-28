@@ -2,7 +2,8 @@ function StockController(StockModel) {
     let controller = {
         create,
         findAll,
-        update
+        update,
+        deleteStockItem
     }
 
     function create (values){
@@ -48,6 +49,22 @@ function StockController(StockModel) {
                 })
                 .catch(err => {
                     reject(err); // Handle any errors that occur during the update operation
+                });
+        });
+    }
+
+    function deleteStockItem(id){
+        return new Promise(function(resolve, reject){
+            StockModel.deleteOne({_id: id})
+                .then(result => {
+                    if (result.deletedCount > 0) {
+                        resolve('Stock deleted');
+                    } else {
+                        reject(new Error('Stock not found'));
+                    }
+                })
+                .catch(err => {
+                    reject(err); // Handle any errors that occur during the delete operation
                 });
         });
     }

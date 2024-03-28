@@ -60,6 +60,24 @@ function StockRouter() {
             });
     });
 
+    // Define DELETE request separately for '/stock/:id'
+    router.delete('/stock/:id', function(req, res, next) {
+        let id = req.params.id;
+        Stock.deleteStockItem(id)
+            .then(() => {
+                console.log('Stock deleted!');
+                res.status(200).send('Stock deleted');
+                next();
+            })
+            .catch((err) => {
+                console.log(err);
+                console.log('Stock not found');
+                err.status = err.status || 500;
+                res.status(400).send('Error deleting stock');
+                next(err); // Pass the error to error-handling middleware
+            });
+    });
+
     return router;
 }
 
