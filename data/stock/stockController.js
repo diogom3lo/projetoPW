@@ -7,6 +7,7 @@ function StockController(StockModel) {
     let controller = {
         create,
         findAll,
+        findById,
         update,
         deleteStockItem
     }
@@ -47,6 +48,22 @@ function StockController(StockModel) {
             StockModel.find({})
                 .then((stock) => {
                     resolve(stock);
+                })
+                .catch((err) => {
+                    reject(err);
+                });
+        });
+    }
+
+    function findById(id) {
+        return new Promise(function(resolve, reject) {
+            StockModel.findById(id)
+                .then((stock) => {
+                    if (stock) {
+                        resolve(stock);
+                    } else {
+                        reject(new Error('Stock not found'));
+                    }
                 })
                 .catch((err) => {
                     reject(err);

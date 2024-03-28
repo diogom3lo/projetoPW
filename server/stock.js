@@ -41,6 +41,24 @@ function StockRouter() {
             });
         });
 
+    // Define GET request separately for '/stock/:id'
+    router.get('/stock/:id', function(req, res, next) {
+        let id = req.params.id;
+        Stock.findById(id)
+            .then((stock) => {
+                console.log('Stock found!');
+                res.send(stock);
+                next();
+            })
+            .catch((err) => {
+                console.log(err);
+                console.log('Stock not found');
+                err.status = err.status || 500;
+                res.status(400).send('Error finding stock');
+                next(err); // Pass the error to error-handling middleware
+            });
+    });
+
     // Define PUT request separately for '/stock/:id'
     router.put('/stock/:id', function(req, res, next) {
         let body = req.body;
