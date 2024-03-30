@@ -59,6 +59,23 @@ function StockRouter() {
             });
     });
 
+
+    router.get('/stock/sort/:sortBy', function(req, res, next) {
+        let sortBy = req.params.sortBy;
+        Stock.findAllAndSort(sortBy)
+            .then((stock) => {
+                console.log('Stock found and sorted!');
+                res.send(stock);
+                next();
+            })
+            .catch((err) => {
+                console.log(err);
+                console.log('Error finding and sorting stock');
+                err.status = err.status || 500;
+                res.status(400).send('Error finding and sorting stock');
+                next(err); // Pass the error to error-handling middleware
+            });
+    });
 // Define GET request separately for '/stock/name/:name'
 router.get('/stock/name/:name', function(req, res, next) {
     let name = req.params.name;

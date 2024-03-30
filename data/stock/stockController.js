@@ -12,7 +12,8 @@ function StockController(StockModel) {
         deleteStockItem,
         findByName,
         updateByName,
-        deleteStockItemByName
+        deleteStockItemByName,
+        findAllAndSort
     }
 
     /**
@@ -56,6 +57,20 @@ function StockController(StockModel) {
                     reject(err);
                 });
         });
+    }
+
+    function findAllAndSort(sortBy) {
+        return StockModel.find({}).sort(sortBy)
+            .then((stock) => {
+                if (stock) {
+                    return stock;
+                } else {
+                    throw new Error('No stock found');
+                }
+            })
+            .catch((err) => {
+                throw new Error('Error finding and sorting stock: ' + err.message);
+            });
     }
 
     function findById(id) {
