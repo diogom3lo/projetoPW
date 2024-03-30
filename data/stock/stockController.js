@@ -9,7 +9,10 @@ function StockController(StockModel) {
         findAll,
         findById,
         update,
-        deleteStockItem
+        deleteStockItem,
+        findByName,
+        updateByName,
+        deleteStockItemByName
     }
 
     /**
@@ -71,6 +74,21 @@ function StockController(StockModel) {
         });
     }
 
+
+    function findByName(name) {
+        return StockModel.findOne({ name: name })
+            .then((stock) => {
+                if (stock) {
+                    return stock;
+                } else {
+                    throw new Error('Stock not found');
+                }
+            })
+            .catch((err) => {
+                throw new Error('Error finding stock: ' + err.message);
+            });
+    }
+
     /**
      * Updates a stock item.
      * @param {string} id - The ID of the stock item to be updated.
@@ -93,6 +111,22 @@ function StockController(StockModel) {
         });
     }
 
+    function updateByName(name, values) {
+        return new Promise(function(resolve, reject) {
+            StockModel.updateOne({name: name}, values)
+                .then(result => {
+                    if (result.modifiedCount > 0) {
+                        resolve('Stock updated');
+                    } else {
+                        reject(new Error('No changes made to the stock'));
+                    }
+                })
+                .catch(err => {
+                    reject(err);
+                });
+        });
+    }
+
     /**
      * Deletes a stock item.
      * @param {string} id - The ID of the stock item to be deleted.
@@ -101,6 +135,23 @@ function StockController(StockModel) {
     function deleteStockItem(id) {
         return new Promise(function(resolve, reject) {
             StockModel.deleteOne({_id: id})
+                .then(result => {
+                    if (result.deletedCount > 0) {
+                        resolve('Stock deleted');
+                    } else {
+                        reject(new Error('Stock not found'));
+                    }
+                })
+                .catch(err => {
+                    reject(err);
+                });
+        });
+    }
+
+
+    function deleteStockItemByName(name) {
+        return new Promise(function(resolve, reject) {
+            StockModel.deleteOne({name: name})
                 .then(result => {
                     if (result.deletedCount > 0) {
                         resolve('Stock deleted');

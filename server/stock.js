@@ -59,6 +59,26 @@ function StockRouter() {
             });
     });
 
+// Define GET request separately for '/stock/name/:name'
+router.get('/stock/name/:name', function(req, res, next) {
+    let name = req.params.name;
+    Stock.findByName(name)
+        .then((stock) => {
+            console.log('Stock found!');
+            res.send(stock);
+            next();
+        })
+        .catch((err) => {
+            console.log(err);
+            console.log('Stock not found');
+            err.status = err.status || 500;
+            res.status(400).send('Error finding stock');
+            next(err); // Pass the error to error-handling middleware
+        });
+});
+
+
+
     // Define PUT request separately for '/stock/:id'
     router.put('/stock/:id', function(req, res, next) {
         let body = req.body;
@@ -78,10 +98,48 @@ function StockRouter() {
             });
     });
 
+
+    router.put('/stock/name/:name', function(req, res, next) {
+        let body = req.body;
+        let name = req.params.name;
+        Stock.updateByName(name, body)
+            .then(() => {
+                console.log('Stock updated!');
+                res.status(200).send(body);
+                next();
+            })
+            .catch((err) => {
+                console.log(err);
+                console.log('Stock not found or no changes made');
+                err.status = err.status || 500;
+                res.status(400).send('Error updating stock');
+                next(err); // Pass the error to error-handling middleware
+            });
+    });
+
     // Define DELETE request separately for '/stock/:id'
     router.delete('/stock/:id', function(req, res, next) {
         let id = req.params.id;
         Stock.deleteStockItem(id)
+            .then(() => {
+                console.log('Stock deleted!');
+                res.status(200).send('Stock deleted');
+                next();
+            })
+            .catch((err) => {
+                console.log(err);
+                console.log('Stock not found');
+                err.status = err.status || 500;
+                res.status(400).send('Error deleting stock');
+                next(err); // Pass the error to error-handling middleware
+            });
+    });
+
+
+
+    router.delete('/stock/name/:name', function(req, res, next) {
+        let name = req.params.name;
+        Stock.deleteStockItemByName(name)
             .then(() => {
                 console.log('Stock deleted!');
                 res.status(200).send('Stock deleted');
