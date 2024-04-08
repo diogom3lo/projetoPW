@@ -28,7 +28,7 @@ function StockRouter() {
           
             Stock.create(body)
             .then(() => {
-                console.log('Created!');
+                console.log('Stock Created!');
                 res.status(200).send(body);
                 next();
             })

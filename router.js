@@ -1,10 +1,14 @@
 const express = require('express');
-let ProjetoAPI = require('./server/stock');
+let RouterStock = require('./server/stock');
+let RouterClient = require('./server/client');
+
 
 function initialize(){
     let api = express();
 
-    api.use('/api', ProjetoAPI());
+    api.use('/api', RouterStock());
+    api.use('/api', RouterClient());
+
 
     return api;
 }
