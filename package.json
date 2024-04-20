@@ -1,8 +1,10 @@
 {
   "dependencies": {
+    "bcrypt": "^5.1.1",
     "body-parser": "^1.20.2",
     "express": "^4.19.2",
     "http": "^0.0.1-security",
+    "jsonwebtoken": "^9.0.2",
     "mongodb": "^6.5.0",
     "mongoose": "^8.2.3",
     "mongose": "^0.0.2-security",

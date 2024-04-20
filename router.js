@@ -1,14 +1,12 @@
 const express = require('express');
-let RouterStock = require('./server/stock');
-let RouterClient = require('./server/client');
 let RouterProduct = require('./server/product');
+let RouterAuth = require('./server/auth');
 
 
 function initialize(){
     let api = express();
     
-    api.use('/api', RouterStock());
-    api.use('/api', RouterClient());
+    api.use('/auth', RouterAuth());
     api.use('/api', RouterProduct());
 
 
