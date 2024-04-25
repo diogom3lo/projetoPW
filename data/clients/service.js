@@ -1,6 +1,7 @@
 const config = require("../../config");
+const jwt = require("jsonwebtoken");
 
-function ClientsService() {
+function ClientsService(ClientModel) {
     let service = {
         create,
         createToken
@@ -18,7 +19,7 @@ function ClientsService() {
             model
             .save()
             .then(() => resolve("User created"))
-            .catch((err) => reject("Error creating user"));
+            .catch((err) => reject(`Error creating user ${err}`));
         });
     }
 

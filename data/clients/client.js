@@ -6,7 +6,7 @@ let Schema = mongoose.Schema;
 let clientSchema = new Schema({
     name: { type: String, required: true },
     email: { type: String, required: true, unique: true },
-    paswwrod: { type: String, required: true },
+    password: { type: String, required: true },
     role : { type: String, required: true },
 });
 
