@@ -1,6 +1,7 @@
 const bodyParser = require('body-parser');
 const express = require('express');
 const client = require('../data/clients');
+const jwt = require("jsonwebtoken");
 
 function RouterAuth(){
     let router = express.Router();
@@ -24,6 +25,26 @@ function RouterAuth(){
             next();
         });
     });
+    router.route("/me").get(function(req, res, next){
+        let token = req.headers['x-access-token'];
+
+        if (!token) {
+            return res
+            .status(401)
+            .send({ auth: false, message: 'No token provided.' });
+        }
+        return client.verifyToken(token)
+        .then((decoded) => {
+            console.log(decoded);
+        res.status(202).send({auth: true, decoded});
+        })
+        .catch((err) => {
+            res.status(500);
+            res.send(err);
+            next();
+        });
+    });
+
 
     return router;
 };

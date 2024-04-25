@@ -4,7 +4,8 @@ const jwt = require("jsonwebtoken");
 function ClientsService(ClientModel) {
     let service = {
         create,
-        createToken
+        createToken,
+        verifyToken
     }
 
     // Create a new client
@@ -32,6 +33,18 @@ function ClientsService(ClientModel) {
         );
 
         return {auth: true, token};
+    }
+
+    function verifyToken(token) {
+        return new Promise((resolve, reject) => {
+            jwt.verify(token, config.secret, (err, decoded) => {
+                if (err) {
+                    reject(err);
+                } else {
+                    return resolve(decoded);
+                }
+            });
+        });
     }
 
     return service;
