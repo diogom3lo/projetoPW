@@ -5,7 +5,8 @@ function ClientsService(ClientModel) {
     let service = {
         create,
         createToken,
-        verifyToken
+        verifyToken,
+        findClient
     }
 
     // Create a new client
@@ -26,12 +27,13 @@ function ClientsService(ClientModel) {
 
     // Create a token for the client
     function createToken(client){
+        console.log("Creating token for client:", client);
         let token = jwt.sign(
             {id: client._id, name: client.name},
             config.secret,
             {expiresIn: config.expiresPassword,}
         );
-
+        console.log("Token created:", token);
         return {auth: true, token};
     }
 
@@ -43,6 +45,19 @@ function ClientsService(ClientModel) {
                 } else {
                     return resolve(decoded);
                 }
+            });
+        });
+    }
+
+    function findClient({email, password}) {
+        return new Promise(function (resolve, reject)  {
+            ClientModel.findOne({ email, password})
+            .then((client) => {
+                if (!client) return reject("Client not found");
+                  return resolve(client);
+            })
+            .catch((err) => {
+                reject(`There is a problem with the login: ${err}`); 
             });
         });
     }

@@ -45,6 +45,29 @@ function RouterAuth(){
         });
     });
 
+    router.route('/login').post(function(req, res, next){
+        let body = req.body;
+        
+        console.log("Login for client:", body);
+        return client.findClient(body)
+        .then((client) => {
+            console.log("Client found:", client);
+           
+        })
+        .then(() => client.createToken(client))
+        .then((response) => {
+            console.log("Token response:", response);
+            res.status(200);
+            res.send(response);
+        })
+        .catch((err) => {
+            res.status(500);
+            console.log("Error:", err);
+            next();
+        });
+    });
+    
+
 
     return router;
 };
