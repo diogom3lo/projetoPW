@@ -1,5 +1,6 @@
 const config = require("../../config");
 const jwt = require("jsonwebtoken");
+const bcrypt = require("bcrypt");
 
 function ClientsService(ClientModel) {
     let service = {
@@ -11,8 +12,18 @@ function ClientsService(ClientModel) {
 
     // Create a new client
     function create(client) {
-        let newClient = new ClientModel(client);
-        return save(newClient);
+        return createPassword(client).then((hashPassword, err) => {
+            if (err) {
+                return Promise.reject("Not saved");
+            }
+           let newClientWithPassword = {
+               ...client,
+               password: hashPassword
+           };
+           let newClient = new ClientModel(newClientWithPassword);
+           return save(newClient);
+        });
+     
     }
 
     // Save the client
@@ -51,17 +62,28 @@ function ClientsService(ClientModel) {
 
     function findClient({email, password}) {
         return new Promise(function (resolve, reject)  {
-            ClientModel.findOne({ email, password})
+            ClientModel.findOne({ email })
             .then((client) => {
                 if (!client) return reject("Client not found");
+                return comparePassword(password, client.password).then((match) => {
+                    if (!match) return reject("Client not valid");
                   return resolve(client);
-            })
+            });
+        })
             .catch((err) => {
                 reject(`There is a problem with the login: ${err}`); 
             });
         });
     }
+    
+function createPassword(client) {
+    return bcrypt.hash(client.password, config.saltRounds);
+}
 
+function comparePassword(password, hash) {
+    return bcrypt.compare(password, hash);
+}
+    
     return service;
 }
 
