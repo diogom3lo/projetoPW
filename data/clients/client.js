@@ -1,5 +1,4 @@
 let mongoose = require('mongoose');
-const { type } = require('os');
 let Schema = mongoose.Schema;
 let scopes = require('./scope');
 

@@ -2,12 +2,35 @@ const bodyParser = require('body-parser');
 const express = require('express');
 const Product = require('../data/product');
 const ProductController = require('../data/product/productController');
+const Client = require('../data/clients');
+const { decode } = require('punycode');
 
 function ProductRouter() {
     let router = express();
 
     router.use(bodyParser.json({limit: '100mb'}));
     router.use(bodyParser.urlencoded({limit: '100mb', extended: true}));
+
+    // Middleware to check if the client is authorized
+    router.use(function(req, res, next) {
+        let token = req.headers["x-access-token"];
+        if (!token) {
+            return res
+                .status(403)
+                .send({ auth: false, message: "No token provided." });
+        }
+
+        Client.verifyToken(token)
+        .then((decoded) => {
+            console.log("-=> Valid Token <=-");
+            console.log("DECODED->" + JSON.stringify(decoded, null, 2));
+            req.roleClient = decoded.role;
+            next();
+        })
+        .catch(() => {
+            res.status(401).send({ auth: false, message: "Not authorized." });
+        })
+    });
 
     // Handle GET and POST requests for '/product'
     router.route('/product')
