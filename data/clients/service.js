@@ -1,13 +1,32 @@
 const config = require("../../config");
 const jwt = require("jsonwebtoken");
 const bcrypt = require("bcrypt");
+const { response } = require("express");
 
 function ClientsService(ClientModel) {
     let service = {
         create,
         createToken,
         verifyToken,
-        findClient
+        findClient,
+        authorize
+    }
+
+    // Check if the client is authorized
+    function authorize(scopes) {
+        return (request, response, next) => {
+            const {roleClient} = request; //roleClient is the decoded token from verifyToken
+            console.log("route scopes:", scopes);
+            console.log("client scopes:", roleClient);
+
+            const hasAtuhorization = scopes.some((scope) => roleClient.includes(scope));
+
+            if(roleClient && hasAtuhorization) {
+                 next();
+            } else{
+                response.status(403).json({ message: "Forbiden"});
+            }
+        }
     }
 
     // Create a new client
@@ -38,13 +57,13 @@ function ClientsService(ClientModel) {
 
     // Create a token for the client
     function createToken(client){
-        console.log("Creating token for client:", client);
         let token = jwt.sign(
-            {id: client._id, name: client.name},
+            { id: client._id, name: client.name, role: client.role.scopes },
             config.secret,
-            {expiresIn: config.expiresPassword,}
+            {
+                expiresIn: config.expiresPassword,
+            }
         );
-        console.log("Token created:", token);
         return {auth: true, token};
     }
 
