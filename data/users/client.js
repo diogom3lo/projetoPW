@@ -8,7 +8,7 @@ let RoleSchema = new Schema({
 });
 
 // Define the schema for the client model
-let clientSchema = new Schema({
+let userSchema = new Schema({
     name: { type: String, required: true },
     email: { type: String, required: true, unique: true },
     password: { type: String, required: true },
@@ -16,6 +16,6 @@ let clientSchema = new Schema({
 });
 
 // Create the model from the schema and export it
-let Client = mongoose.model('Client', clientSchema);
+let User = mongoose.model('User', userSchema);
 
-module.exports = Client;
+module.exports = User;

@@ -3,25 +3,25 @@ const jwt = require("jsonwebtoken");
 const bcrypt = require("bcrypt");
 const { response } = require("express");
 
-function ClientsService(ClientModel) {
+function UserService(UserModel) {
     let service = {
         create,
         createToken,
         verifyToken,
-        findClient,
+        findUser,
         authorize
     }
 
     // Check if the client is authorized
     function authorize(scopes) {
         return (request, response, next) => {
-            const {roleClient} = request; //roleClient is the decoded token from verifyToken
+            const {roleUser} = request; //roleClient is the decoded token from verifyToken
             console.log("route scopes:", scopes);
-            console.log("client scopes:", roleClient);
+            console.log("User scopes:", roleUser);
 
-            const hasAtuhorization = scopes.some((scope) => roleClient.includes(scope));
+            const hasAtuhorization = scopes.some((scope) => roleUser.includes(scope));
 
-            if(roleClient && hasAtuhorization) {
+            if(roleUser && hasAtuhorization) {
                  next();
             } else{
                 response.status(403).json({ message: "Forbiden"});
@@ -30,17 +30,17 @@ function ClientsService(ClientModel) {
     }
 
     // Create a new client
-    function create(client) {
-        return createPassword(client).then((hashPassword, err) => {
+    function create(user) {
+        return createPassword(user).then((hashPassword, err) => {
             if (err) {
                 return Promise.reject("Not saved");
             }
-           let newClientWithPassword = {
-               ...client,
+           let newUserWithPassword = {
+               ...user,
                password: hashPassword
            };
-           let newClient = new ClientModel(newClientWithPassword);
-           return save(newClient);
+           let newUser = new UserModel(newUserWithPassword);
+           return save(newUser);
         });
      
     }
@@ -56,9 +56,9 @@ function ClientsService(ClientModel) {
     }
 
     // Create a token for the client
-    function createToken(client){
+    function createToken(user){
         let token = jwt.sign(
-            { id: client._id, name: client.name, role: client.role.scopes },
+            { id: user._id, name: user.name, role: user.role.scopes },
             config.secret,
             {
                 expiresIn: config.expiresPassword,
@@ -79,14 +79,14 @@ function ClientsService(ClientModel) {
         });
     }
 
-    function findClient({email, password}) {
+    function findUser({email, password}) {
         return new Promise(function (resolve, reject)  {
-            ClientModel.findOne({ email })
-            .then((client) => {
-                if (!client) return reject("Client not found");
-                return comparePassword(password, client.password).then((match) => {
-                    if (!match) return reject("Client not valid");
-                  return resolve(client);
+            UserModel.findOne({ email })
+            .then((user) => {
+                if (!user) return reject("User not found");
+                return comparePassword(password, user.password).then((match) => {
+                    if (!match) return reject("User not valid");
+                  return resolve(user);
             });
         })
             .catch((err) => {
@@ -95,8 +95,8 @@ function ClientsService(ClientModel) {
         });
     }
     
-function createPassword(client) {
-    return bcrypt.hash(client.password, config.saltRounds);
+function createPassword(user) {
+    return bcrypt.hash(user.password, config.saltRounds);
 }
 
 function comparePassword(password, hash) {
@@ -106,4 +106,4 @@ function comparePassword(password, hash) {
     return service;
 }
 
-module.exports = ClientsService;
+module.exports = UserService;

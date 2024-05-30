@@ -2,9 +2,9 @@ const bodyParser = require('body-parser');
 const express = require('express');
 const Product = require('../data/product');
 const ProductController = require('../data/product/productController');
-const Client = require('../data/clients');
+const User = require('../data/users');
 const { decode } = require('punycode');
-const scopes = require('../data/clients/scope');
+const scopes = require('../data/users/scope');
 
 function ProductRouter() {
     let router = express();
@@ -21,7 +21,7 @@ function ProductRouter() {
                 .send({ auth: false, message: "No token provided." });
         }
 
-        Client.verifyToken(token)
+        User.verifyToken(token)
         .then((decoded) => {
             console.log("-=> Valid Token <=-");
             console.log("DECODED->" + JSON.stringify(decoded, null, 2));
@@ -35,7 +35,7 @@ function ProductRouter() {
 
     // Handle GET and POST requests for '/product'
     router.route('/product')
-        .get(Client.authorize([scopes["read-all"], scopes["read-posts"]]), function(req, res, next){
+        .get(User.authorize([scopes["read-all"], scopes["read-posts"]]), function(req, res, next){
             console.log('get all product');
             Product.findAll()
             .then((product) => {
@@ -46,7 +46,7 @@ function ProductRouter() {
                 next(err); // Pass the error to error-handling middleware
             });
         })
-        .post(Client.authorize([scopes["manage-posts"]]), function(req, res, next){
+        .post(User.authorize([scopes["manage-posts"]]), function(req, res, next){
             console.log('post');
             let body = req.body;
           
@@ -66,7 +66,7 @@ function ProductRouter() {
         });
 
     // Define GET request separately for '/product/:id'
-    router.get('/product/:id', (Client.authorize([scopes["read-all"], scopes["read-posts"]])), function(req, res, next) {
+    router.get('/product/:id', (User.authorize([scopes["read-all"], scopes["read-posts"]])), function(req, res, next) {
         let id = req.params.id;
         Product.findById(id)
             .then((product) => {
@@ -84,7 +84,7 @@ function ProductRouter() {
     });
 
     // Define GET request separately for '/product/sort/:sortBy'
-    router.get('/product/sort/:sortBy', (Client.authorize([scopes["read-all"], scopes["read-posts"]])), function(req, res, next) {
+    router.get('/product/sort/:sortBy', (User.authorize([scopes["read-all"], scopes["read-posts"]])), function(req, res, next) {
         let sortBy = req.params.sortBy;
         Product.findAllAndSort(sortBy)
             .then((product) => {
@@ -102,7 +102,7 @@ function ProductRouter() {
     });
 
     // Define GET request separately for '/product/name/:name'
-    router.get('/product/name/:name', (Client.authorize([scopes["read-all"], scopes["read-posts"]])), function(req, res, next) {
+    router.get('/product/name/:name', (User.authorize([scopes["read-all"], scopes["read-posts"]])), function(req, res, next) {
         let name = req.params.name;
         Product.findByName(name)
             .then((product) => {
@@ -120,7 +120,7 @@ function ProductRouter() {
     });
 
     // Define PUT request separately for '/product/:id'
-    router.put('/product/:id', (Client.authorize([scopes["manage-posts"]])), function(req, res, next) {
+    router.put('/product/:id', (User.authorize([scopes["manage-posts"]])), function(req, res, next) {
         let id = req.params.id;
         let body = req.body;
         Product.update(id, body)
@@ -139,7 +139,7 @@ function ProductRouter() {
     });
 
     // Define PUT request separately for '/product/name/:name'
-    router.put('/product/name/:name', (Client.authorize([scopes["manage-posts"]])), function(req, res, next) {
+    router.put('/product/name/:name', (User.authorize([scopes["manage-posts"]])), function(req, res, next) {
         let body = req.body;
         let name = req.params.name;
         Product.updateByName(name, body)
@@ -158,7 +158,7 @@ function ProductRouter() {
     });
 
     // Define DELETE request separately for '/product/:id'
-    router.delete('/product/:id', (Client.authorize([scopes["read-all"], scopes["read-posts"]])), function(req, res, next) {
+    router.delete('/product/:id', (User.authorize([scopes["read-all"], scopes["read-posts"]])), function(req, res, next) {
         let id = req.params.id;
         Product.delete(id)
             .then(() => {
@@ -176,7 +176,7 @@ function ProductRouter() {
     });
 
     // Define DELETE request separately for '/product/name/:name'
-    router.delete('/product/name/:name', (Client.authorize([scopes["read-all"], scopes["read-posts"]])), function(req, res, next) {
+    router.delete('/product/name/:name', (User.authorize([scopes["read-all"], scopes["read-posts"]])), function(req, res, next) {
         let name = req.params.name;
         Product.deleteByName(name)
             .then(() => {

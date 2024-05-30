@@ -1,6 +1,6 @@
 const bodyParser = require('body-parser');
 const express = require('express');
-const client = require('../data/clients');
+const user = require('../data/users');
 const jwt = require("jsonwebtoken");
 
 function RouterAuth(){
@@ -12,8 +12,8 @@ function RouterAuth(){
     router.route('/register').post(function(req, res, next){
         const body = req.body;
         console.log("User:", body);
-        client.create(body)
-        .then(() => client.createToken(body))
+        user.create(body)
+        .then(() => user.createToken(body))
         .then((response) => {
             res.status(200);
             console.log("User Token:", response);
@@ -33,7 +33,7 @@ function RouterAuth(){
             .status(401)
             .send({ auth: false, message: 'No token provided.' });
         }
-        return client.verifyToken(token)
+        return user.verifyToken(token)
         .then((decoded) => {
             console.log(decoded);
         res.status(202).send({auth: true, decoded});
@@ -48,13 +48,13 @@ function RouterAuth(){
     router.route('/login').post(function(req, res, next){
         let body = req.body;
         
-        console.log("Login for client:", body);
-        return client.findClient(body)
-        .then((client) => {
-            console.log("Client found:", client);
+        console.log("Login for user:", body);
+        return user.findUser(body)
+        .then((user) => {
+            console.log("User found:", user);
            
         })
-        .then(() => client.createToken(client))
+        .then(() => user.createToken(user))
         .then((response) => {
             console.log("Token response:", response);
             res.status(200);
