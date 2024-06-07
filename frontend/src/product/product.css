@@ -1,0 +1,19 @@
+.product{
+    display: flex;
+    width: 50%;
+    border: 1px blue solid;
+    margin-bottom: 5px;
+}
+
+.player-cell{
+    flex: 1;
+    border-left: red 1px solid;
+    border-right: red 1px solid;
+}
+
+.player-label{
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 20px;
+}

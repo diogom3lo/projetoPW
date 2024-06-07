@@ -12,7 +12,7 @@ let userSchema = new Schema({
     name: { type: String, required: true },
     email: { type: String, required: true, unique: true },
     password: { type: String, required: true },
-    role : { type: RoleSchema}
+    role : { type: String, required: true },
 });
 
 // Create the model from the schema and export it
