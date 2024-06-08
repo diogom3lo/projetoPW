@@ -2,6 +2,7 @@ import React from 'react'; // Import the 'React' library
 import Product from "./product.js";
 import "./productLogic.css";
 import Config from "../config.js";
+import product from './product.js';
 
 // Define the 'ProductLogic' component
 const ProductLogic = () => {
@@ -10,7 +11,7 @@ const ProductLogic = () => {
 
     // Use 'React.useEffect' instead of 'useEffect'
     React.useEffect(() => {
-        fetch ("/api/product", {
+        fetch ("/api/product",  {
             headers: {"Accept": "application/json", "x-access-token": Config.token}
         })
         .then((response) => response.json())
@@ -20,7 +21,7 @@ const ProductLogic = () => {
         });
          return() => setProducts([]); // Return a function that sets 'products' to an empty array
         
-    })
+    }, []); // Pass an empty array as the second argument to 'React.useEffect'
 
     // If 'loading' is true, return a 'Loading...' message
     if(loading){
@@ -32,7 +33,7 @@ const ProductLogic = () => {
             <label>Products: </label>
             <url>
                 {
-                    products.map((product) => <Product key={product._id} {...product}/>)
+                    product.map((product) => <Product key={product._id} {...product}/>)
                 }
             </url>
         </div>
