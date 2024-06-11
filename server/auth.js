@@ -1,35 +1,34 @@
-const bodyParser = require('body-parser');
 const express = require('express');
-const userService = require('../data/users'); // Import the userService instance
-const rolesConfig = require('../data/users/roles'); // Import roles configuration
+const bodyParser = require('body-parser');
+const userService = require('../data/users'); // Adjust the path if necessary
+const Role = require('../data/roleSchema'); // Adjust the path if necessary
 
-function RouterAuth() {
+const RouterAuth = () => {
     let router = express.Router();
 
     router.use(bodyParser.json({ limit: '100mb' }));
     router.use(bodyParser.urlencoded({ limit: '100mb', extended: true }));
 
-    // Middleware to attach roles to the request
-    router.use(userService.attachRoleUser);
-
-    // Register Route
-    router.route('/register').post(async (req, res, next) => {
-        const body = req.body;
-        console.log("User:", body);
-
-        // Assign roles to the user
-        if (!body.roles) {
-            body.roles = ['user']; // Default role if none is provided
-        }
+    router.post('/register', async (req, res, next) => {
+        const { name, email, password, role } = req.body;
 
         try {
-            const newUser = await userService.create(body);
-            const response = await userService.createToken(newUser);
-            console.log("User Token:", response);
-            res.status(200).send(response);
-        } catch (err) {
-            console.log("Error:", err);
-            res.status(500).send({ message: "Error creating user", error: err.message });
+            const roleDoc = await Role.findOne({ name: role });
+            if (!roleDoc) {
+                return res.status(400).send({ message: 'Invalid role' });
+            }
+
+            const newUser = await userService.create({
+                name,
+                email,
+                password,
+                role: roleDoc._id
+            });
+
+            const token = await userService.createToken(newUser);
+            res.status(200).send({ token });
+        } catch (error) {
+            res.status(500).send(error);
         }
     });
 

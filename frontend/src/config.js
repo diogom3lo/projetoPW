@@ -1,5 +1,5 @@
 const config = {
-    token:  "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJyb2xlcyI6W10sInNjb3BlcyI6W10sImlhdCI6MTcxODEwNDA5MiwiZXhwIjoxNzE4MTkyNDkyfQ.HPdYrq_xcoSoJso-Sz5n-9yXbY15la-MVxWCrCDO34U",
+    token: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY2NjJjYTA0YTdkMDNiOGRlY2M4OWRmNiIsIm5hbWUiOiJNZWxvIiwicm9sZXMiOltdLCJzY29wZXMiOltdLCJpYXQiOjE3MTgxMjE3MDEsImV4cCI6MTcxODIxMDEwMX0.jDdzIqkyPPObbOn-cohTw2q_yNzk1oVXIdZSKcCeAyc",
 }
 
 export default config;

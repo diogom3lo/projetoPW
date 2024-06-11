@@ -1,21 +1,22 @@
-let mongoose = require('mongoose');
-let Schema = mongoose.Schema;
-let scopes = require('./scope');
+const mongoose = require('mongoose');
+const bcrypt = require('bcryptjs');
+const Schema = mongoose.Schema;
 
-let RoleSchema = new Schema({
-    name: {type: String, required: true},
-    scopes:[ {type: String, enum:[scopes['read-all'],scopes['manage-posts'],scopes['read-posts']]}]
-});
-
-// Define the schema for the client model
-let userSchema = new Schema({
+const userSchema = new Schema({
     name: { type: String, required: true },
     email: { type: String, required: true, unique: true },
     password: { type: String, required: true },
-    role : { type: String, required: true },
+    role: { type: Schema.Types.ObjectId, ref: 'Role', required: true }
 });
 
-// Create the model from the schema and export it
-let User = mongoose.model('User', userSchema);
+// Hash the password before saving the user
+userSchema.pre('save', async function(next) {
+    if (this.isModified('password') || this.isNew) {
+        this.password = await bcrypt.hash(this.password, 10);
+    }
+    next();
+});
+
+const User = mongoose.model('User', userSchema);
 
 module.exports = User;

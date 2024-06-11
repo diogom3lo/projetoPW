@@ -1,7 +1,21 @@
 const config = require("../../config");
 const jwt = require("jsonwebtoken");
-const bcrypt = require("bcrypt");
-const rolesConfig = require('./roles');
+const bcrypt = require('bcryptjs');
+const User = require('./client');
+const Role = require('../roleSchema'); 
+
+const verifyToken = async (token) => {
+    try {
+        const decoded = jwt.verify(token, config.secret);
+        const user = await User.findById(decoded.id).populate('role');
+        if (!user) {
+            throw new Error('User not found');
+        }
+        return { id: user._id, role: user.role.name, scopes: user.role.scopes };
+    } catch (error) {
+        throw error;
+    }
+};
 
 function UserService(UserModel) {
     let service = {
@@ -98,18 +112,6 @@ function UserService(UserModel) {
         return Array.from(scopesSet);
     }
 
-    function verifyToken(token) {
-        return new Promise((resolve, reject) => {
-            jwt.verify(token, config.secret, (err, decoded) => {
-                if (err) {
-                    reject(err);
-                } else {
-                    resolve(decoded);
-                }
-            });
-        });
-    }
-
     function findUser({ email, password }) {
         return new Promise(function (resolve, reject) {
             UserModel.findOne({ email })
@@ -138,3 +140,4 @@ function UserService(UserModel) {
 }
 
 module.exports = UserService;
+

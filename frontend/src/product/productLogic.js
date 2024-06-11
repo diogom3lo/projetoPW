@@ -9,35 +9,46 @@ const ProductLogic = () => {
     const [products, setProducts] = React.useState([]);
     const [error, setError] = React.useState(null);
 
-    // Fetch products on component mount
     React.useEffect(() => {
-        fetch("/api/product", {
-            headers: {
-                "Accept": "application/json",
-                "x-access-token": Config.token
+        const fetchProducts = async () => {
+            try {
+                const headers = {
+                    "Accept": "application/json",
+                    "x-access-token": Config.token
+                };
+    
+                const response = await fetch("/api/product", {
+                    headers
+                });
+    
+                if (!response.ok) {
+                    throw new Error('Network response was not ok ' + response.statusText);
+                }
+    
+                const data = await response.json();
+    
+                if (Array.isArray(data)) {
+                    setProducts(data);
+                } else {
+                    throw new Error('API response is not an array');
+                }
+            } catch (error) {
+                console.error('Fetch error:', error); // Log the error for debugging
+                setError(error.message);
+            } finally {
+                setLoading(false);
             }
-        })
-        .then((response) => {
-            if (!response.ok) {
-                throw new Error('Network response was not ok ' + response.statusText);
-            }
-            return response.json();
-        })
-        .then((data) => {
-            if (Array.isArray(data)) {
-                setProducts(data);
-            } else {
-                throw new Error('API response is not an array');
-            }
-            setLoading(false);
-        })
-        .catch((error) => {
-            setError(error.message);
-            setLoading(false);
-        });
-
+        };
+    
+        fetchProducts();
+    
         return () => setProducts([]); // Cleanup function
     }, []);
+    
+    
+
+    
+
 
     if (loading) {
         return <h1>Loading...</h1>;
