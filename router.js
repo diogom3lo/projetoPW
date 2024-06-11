@@ -1,12 +1,13 @@
 const express = require('express');
-let RouterProduct = require('./server/product');
-let RouterAuth = require('./server/auth');
-let RouterVendas = require('./server/vendas');
-let RouterCompras = require('./server/compras');
+const RouterProduct = require('./server/product');
+const RouterAuth = require('./server/auth');
+const RouterVendas = require('./server/vendas');
+const RouterCompras = require('./server/compras');
 
-function initialize(){
-    let api = express();
-    
+function initialize() {
+    const api = express();
+
+    // Use the route modules
     api.use('/auth', RouterAuth());
     api.use('/api', RouterProduct());
     api.use('/vendas', RouterVendas());
@@ -15,6 +16,6 @@ function initialize(){
     return api;
 }
 
-module.exports ={
-    initialize : initialize,
+module.exports = {
+    initialize
 };

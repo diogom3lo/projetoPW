@@ -1,43 +1,63 @@
-import React from 'react'; // Import the 'React' library
+import React from 'react';
 import Product from "./product.js";
 import "./productLogic.css";
 import Config from "../config.js";
-import product from './product.js';
 
 // Define the 'ProductLogic' component
 const ProductLogic = () => {
-    const [loading, setLoading] = React.useState(true); // Use 'React.useState' instead of 'useState'
+    const [loading, setLoading] = React.useState(true);
     const [products, setProducts] = React.useState([]);
+    const [error, setError] = React.useState(null);
 
-    // Use 'React.useEffect' instead of 'useEffect'
+    // Fetch products on component mount
     React.useEffect(() => {
-        fetch ("/api/product",  {
-            headers: {"Accept": "application/json", "x-access-token": Config.token}
+        fetch("/api/product", {
+            headers: {
+                "Accept": "application/json",
+                "x-access-token": Config.token
+            }
         })
-        .then((response) => response.json())
-        .then((response) =>{
+        .then((response) => {
+            if (!response.ok) {
+                throw new Error('Network response was not ok ' + response.statusText);
+            }
+            return response.json();
+        })
+        .then((data) => {
+            if (Array.isArray(data)) {
+                setProducts(data);
+            } else {
+                throw new Error('API response is not an array');
+            }
             setLoading(false);
-            setProducts(response);
+        })
+        .catch((error) => {
+            setError(error.message);
+            setLoading(false);
         });
-         return() => setProducts([]); // Return a function that sets 'products' to an empty array
-        
-    }, []); // Pass an empty array as the second argument to 'React.useEffect'
 
-    // If 'loading' is true, return a 'Loading...' message
-    if(loading){
+        return () => setProducts([]); // Cleanup function
+    }, []);
+
+    if (loading) {
         return <h1>Loading...</h1>;
     }
 
-    return(
+    if (error) {
+        return <h1>Error: {error}</h1>;
+    }
+
+    return (
         <div className='products'>
             <label>Products: </label>
-            <url>
-                {
-                    product.map((product) => <Product key={product._id} {...product}/>)
-                }
-            </url>
+            <ul>
+                {products.map((product) => (
+                    <Product key={product._id} {...product} />
+                ))}
+            </ul>
         </div>
-    )
+    );
 };
 
-export default ProductLogic; // Export the 'ProductLogic' component
+export default ProductLogic;
+
