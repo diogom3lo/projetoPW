@@ -1,50 +1,65 @@
 import { useForm } from "react-hook-form";
-import "./PlayersForm.css";
 import Config from "../../config";
 
-const PlayersForm = () => {
+const UsersForm = () => {
     const { register, handleSubmit } = useForm();
+
     const onSubmit = (data) => {
-        fetch("/team/players", {
+        fetch(`http://localhost:9000/auth/register`, {
+            method: "POST",
             headers: {
                 "Content-Type": "application/json",
                 "x-access-token": Config.token,
             },
-            method: "POST",
             body: JSON.stringify(data),
         })
         .then((response) => {
-            if (response.ok){
+            if (response.ok) {
                 return response.json();
             } else {
-                alert ("Player duplicate");
+                throw new Error('User registration failed');
             }
         })
+        .then((data) => {
+            console.log("Registration successful:", data);
+            // Trate o sucesso aqui, como redirecionar para outra página
+        })
         .catch((error) => {
-            console.error("Error:", error);
+            console.error("Error during registration:", error); // Loga o erro completo
+            // Trate o erro aqui, como mostrar uma mensagem de erro para o usuário
         });
     };
-
-    const buildPlayers = data => {
-        return {...data}
-    };
+    
+    
 
     return (
         <>
-        <h2>PlayersForm</h2>
-        <form className="playerForm" onSubmit={handleSubmit(onSubmit)}>
+        <h2>Users Form</h2>
+        <form className="userForm" onSubmit={handleSubmit(onSubmit)}>
+            <div className="field">
+                <label>Email:</label>
+                <input name="email" {...register("email")} />
+            </div>
             <div className="field">
                 <label>Name:</label>
                 <input name="name" {...register("name")} />
             </div>
             <div className="field">
-                <label>Last Name:</label>
-                <input name="lastName" {...register("lastName")} />
+                <label>Password:</label>
+                <input name="password" type="password" {...register("password")} />
             </div>
-            <input className="submit" type="submit" />
+            <div className="field">
+                <label>Role:</label>
+                <select name="role.name" {...register("role.name")}>
+                    <option value="admin">Admin</option>
+                    <option value="user">User</option>
+                    {/* Add other role options as needed */}
+                </select>
+            </div>
+            <input className="submit" type="submit" value="Register User" />
         </form>
         </>
     );
 };
 
-export default PlayersForm;
+export default UsersForm;

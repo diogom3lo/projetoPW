@@ -3,6 +3,7 @@ import './Players.css';
 import { useState, useEffect } from 'react';
 import { useNavigate, Link, useLocation } from 'react-router-dom';
 import PlayerForm from './add/PlayersForm';
+import ProductForm from './add/ProductForm';
 import config from '../config'; 
 import PlayerTable from './PlayerTable';
 
@@ -10,6 +11,7 @@ const Players = () => {
     let navigate = useNavigate();
     let location = useLocation();
     const [showForm, setShowForm] = useState(false);
+    const [showFormProduct, setShowFormProduct] = useState(false);
     const [userLogged, setUserLogged] = useState(true);
 
     const OnClickLogout = () => {
@@ -40,12 +42,16 @@ const Players = () => {
         })
     }, [])
 
+    const OnClickShowFormProduct = () => {
+        setShowFormProduct(!showFormProduct);
+    }
+
     const OnClickShowForm = () => {
         setShowForm(!showForm);
     }
 
     const showFormMessage = showForm ? "Hide Form" : "Show Form";
-
+    const showFormProductMessage = showFormProduct ? "Hide" : "Show Form Product";
 
 
 if(!userLogged){
@@ -61,13 +67,17 @@ if(!userLogged){
                 <button className='buttons' onClick={OnClickShowForm}>
                     {showFormMessage}
                 </button>
+                <button className='buttons' onClick={OnClickShowFormProduct}>
+                    {showFormProductMessage}
+                </button>
                 <button className="buttons" onClick={OnClickLogout}> Logout </button>
             </div>
-            <label>PLAYERS:</label>
+            <label>Produtos:</label>
             <div className='player-container'>
                 <PlayerTable url={location} />
             </div>
             {showForm && <PlayerForm />}
+            {showFormProduct && <ProductForm />}
         </div>
     );
 }

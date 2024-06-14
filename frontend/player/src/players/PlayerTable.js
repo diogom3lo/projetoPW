@@ -1,127 +1,108 @@
-import './PlayerTable.css';
-import React ,{
-    useState,
-    useEffect
-} from "react";
-import config from '../config';
+import React, { useState, useEffect } from "react";
 import { Table } from 'antd';
 import qs from 'query-string';
-import { useLocalStorage } from 'react-use-storage';
-import { getPreferencesUrlToStorage, getPreferencesToStorage, preferencesToStorage } from './utils/localStorage';
 
+const PlayerTable = () => {
+    const columns = [
+        {
+            title: "Name",
+            dataIndex: "name",
+            key: "name"
+        },
+        {
+            title: "Number",
+            dataIndex: "number",
+            key: "number"
+        },
+        {
+            title: "Price",
+            dataIndex: "price",
+            key: "price"
+        },
+        {
+            title: "Category",
+            dataIndex: "category",
+            key: "category"
+        },
+        {
+            title: "Description",
+            dataIndex: "description",
+            key: "description"
+        },
+        {
+            title: "Image",
+            dataIndex: "image",
+            key: "image"
+        },
+        {
+            title: "Rating",
+            dataIndex: "rating",
+            key: "rating"
+        }
+    ];
 
-const PlayerTable = (props) => {
-
-    const columns = [{
-        title: "Name",
-        dataIndex: "name",
-        width: "20%",
-        key:"name"
-    },
-{
-    title: "LastName",
-    dataIndex: "lastName",
-    width: "20%"
-}];
-
-const fetchApi = (pageSize, current) => {
-    const url =
-    "/team/players?" +
-    new URLSearchParams({
-        limit: pageSize,
-        skip: current -1
+    const [loading, setLoading] = useState(true);
+    const [data, setData] = useState({
+        products: [],
+        pagination: {
+            current: 1,
+            pageSize: 5,
+            total: 0,
+        },
     });
 
-    fetch(url , {
-        headers: { Accept: "application/json" },
-    })
-    .then((response) => response.json())
-    .then((response)=> {
-        const { players = [], pagination} = response.players;
-        const auth = response.auth;
-
-
-        if(auth){
+    const fetchProducts = (pageSize, current) => {
+        const url = `/api/product?${qs.stringify({ limit: pageSize, skip: current - 1 })}`;
+    
+        fetch(url)
+        .then((response) => {
+            if (!response.ok) {
+                throw new Error(`HTTP error! Status: ${response.status}`);
+            }
+            return response.json();
+        })
+        .then((response) => {
+            const { products = [], pagination } = response; // Adjust according to your API response structure
+    
             setData({
-                players,
+                products: products,
                 pagination: {
                     current: current || 1,
                     pageSize: pagination.pageSize || 10,
-                    total: pagination.total || 5,
+                    total: pagination.total || 0,
                 },
-            })
-
-            setPreferencesToStorage({
-                current: getCurrentPage()
             });
+
             setLoading(false);
-        }
-    })
-};
-
-
-useEffect(() => {
-    fetchApi(data.pagination.pageSize, data.pagination.current);
-
-    return () => 
-        setData({
-            players: [],
-            pagination: {
-                current:1,
-                pageSize: 10,
-            },
+        })
+        .catch((error) => {
+            console.error("Error fetching data:", error);
+            setLoading(false);
         });
-}, []);
-
-const handleTableChange = (pagination) => {
-    fetchApi(pagination.pageSize, pagination.current);
-};
-
-
-   
-    const [loading, setLoading] = useState(true);
-
-    const preferences = getPreferencesUrlToStorage("table");
-    const [preferencesStorage, setPreferencesToStorage] = useLocalStorage( preferences, {
-        current: preferences[preferencesToStorage.PAGE_TABLE] || 1
-    });
-    const [data, setData] = useState({
-            players: [],
-            pagination: {
-                current: getCurrentPage(),
-                pageSize: getPageSize(),
-                total: 0,
-                preferencesStorage
-            },
-        });
+    };
     
-     const {players, pagination} = data;
+    useEffect(() => {
+        fetchProducts(data.pagination.pageSize, data.pagination.current);
 
-    function getCurrentPage(){
-        const queryParams = qs.parse(props.url.search);
-        const current = queryParams.current;
-        return current ? Number(current) : 1;
-    }
+        return () => {
+            // Cleanup logic if needed
+        };
+    }, []);
 
-    function getPageSize(){
-    const queryParams = qs.parse(props.url.search);
-    const pageSize = queryParams.pageSize;
-    return pageSize ? Number(pageSize) : 5;
-    }
-
-    
+    const handleTableChange = (pagination) => {
+        fetchProducts(pagination.pageSize, pagination.current);
+    };
 
     return (
-      <Table
-      columns={columns}
-      rowKey={(record) => record._id}
-      dataSource={players}
-      pagination={pagination}
-      loading={loading}
-      onChange={handleTableChange} 
-      />
-    )
-
-}
+        <Table
+            columns={columns}
+            rowKey={(record) => record._id} // Adjust according to your record structure
+            dataSource={data.products}
+            pagination={data.pagination}
+            loading={loading}
+            onChange={handleTableChange}
+        />
+    );
+};
 
 export default PlayerTable;
